@@ -1,7 +1,14 @@
+# Python
+__pycache__/
+*pyc
+# Entornos virtuales
+env/
 .env
+# Datos (Excel y CSV)
 *.ipynb
 *.xlsx
 *.xls
 /queries/
+/data/
+# Archivos de configuración de PyCharm
 /.idea/
-.pdf
