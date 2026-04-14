@@ -1,0 +1,16 @@
+{
+  "columnas_importes": [
+    "enero", "febrero", "marzo", "abril",
+    "mayo", "junio", "julio", "agosto",
+    "septiembre", "octubre","noviembre",
+    "diciembre","anual"
+  ],
+  "columnas_descriptivos": [
+    "clave_presupuestaria","anio","ramo","institucion","unidad_responsable",
+    "finalidad","funcion","subfuncion","programa_presupuestario",
+    "subprograma_presupuestario","actividad_institucional","identificador_gasto",
+    "fuente_financiamiento","origen","procedencia","actividad_especifica",
+    "partida_especifica","tipo_gasto","region","municipio","ppi"
+  ],
+  "ruta_output": "data/output/reporte_completo.xlsx"
+}

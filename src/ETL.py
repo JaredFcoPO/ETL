@@ -1,10 +1,8 @@
-from base_datos import *
+
 from sqlalchemy import text
 import pandas as pd
-
-columnas_importes = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre',
-                         'octubre', 'noviembre', 'diciembre', 'anual']
-columnas_descriptivos = ['clave_presupuestaria','anio','ramo','institucion','unidad_responsable','finalidad','funcion','subfuncion','programa_presupuestario','subprograma_presupuestario','actividad_institucional','identificador_gasto','fuente_financiamiento','origen','procedencia','actividad_especifica','partida_especifica','tipo_gasto','region','municipio','ppi']
+from src.base_datos import *
+import os
 
 def recibe_ruta(mensaje):
     mensaje = input(mensaje)
@@ -46,6 +44,8 @@ def valida_descriptivos(df_original, df_actualizada):
     df_actualizada_descriptivos_index = df_actualizada_descriptivos_index.reindex(
         sorted(df_actualizada_descriptivos_index.columns), axis=1)
     diferencias = df_original_descriptivos_index.compare(df_actualizada_descriptivos_index, align_axis=1)
+    diferencias.rename(columns={'self':'Archivo_Original','other':'Archivo_Actualizado'}, level=1,inplace=True)
+    diferencias.columns = ['_'.join(col) for col in diferencias.columns]
     return diferencias
 
 def get_dimensiones(df_original, df_actualizada):
@@ -66,21 +66,40 @@ def valida_dimensiones(col_ori, col_act):
     diferencias = a ^ b
     return ambos, solo_a, solo_b, diferencias
 
-## Por la conversión de nulos a vacíos esto ya no sirve, tendríamos que buscar ahora lo que sea ''
+
 def registros_nulos(df_original, df_actualizada):
-    nulos_original = df_original.isnull().sum()
+    nulos_original = (df_original == '').sum()
     nulos_original = nulos_original.reset_index()
     nulos_original.columns = ['Columna', 'Total_Nulos']
-    nulos_actualizada = df_actualizada.isnull().sum()
+    nulos_actualizada = (df_actualizada == '').sum()
     nulos_actualizada = nulos_actualizada.reset_index()
     nulos_actualizada.columns = ['Columna', 'Total_Nulos']
+    columnas_vacias_original = nulos_original[nulos_original.Total_Nulos>0]
+    columnas_vacias_actualizada = nulos_actualizada[nulos_actualizada.Total_Nulos>0]
+    return  columnas_vacias_original, columnas_vacias_actualizada
 
-def exporta_df(data):
-    if not data.empty:
-        data.to_excel('diferencias.xlsx')
-        print('Reporte_generado')
+
+def genera_reporte(diccionarios_dfs, archivo = 'reporte_completo.xlsx'):
+    os.makedirs(os.path.dirname(archivo), exist_ok=True)
+    print(f"Generando reporte en: {archivo}...")
+    if diccionarios_dfs:
+        with pd.ExcelWriter(archivo, engine='xlsxwriter') as writer:
+            for hoja, df in diccionarios_dfs.items():
+                if df is not None and not df.empty:
+                    repo_con_llave = ['Cruce Completo', 'Valida_descriptivos']
+                    usar_indice = True if hoja in repo_con_llave else False
+                    df.to_excel(writer, sheet_name=hoja, index=usar_indice)
+                    workbook = writer.book
+                    worksheet = writer.sheets[hoja]
+                    formato_moneda = workbook.add_format({'num_format':'#,##0.00'})
+                    worksheet.set_column('A:A', 15)
+                    worksheet.set_column('B:AZ', 15)
+                    if hoja == 'Valida_calendario':
+                        worksheet.set_column('B:E', 17, formato_moneda)
+        print("Reporte generado con éxito")
     else:
-        print('No hay diferencias')
+        print("El diccionario de resultado está vacío, no hay nada que exportar")
+
 
 def recibe_llave(mensaje):
     texto = input(mensaje)
@@ -104,5 +123,7 @@ def compara_todo(df_original, df_actualizada, columnas_comunes):
     df_original_index = df_original_index.reindex(sorted(df_original_index.columns), axis=1)
     df_actualizada_index = df_actualizada_index.reindex(sorted(df_actualizada_index.columns), axis=1)
     dif = df_original_index.compare(df_actualizada_index, align_axis=1)
+    dif.rename(columns={'self':'Archivo_Original','other':'Archivo_Actualizada'}, level = 1, inplace=True)
+    dif.columns = ['_'.join(col) for col in dif.columns]
     return dif
 

@@ -1,6 +1,6 @@
-# Probando...
+from src.ETL import *
+from src.config import ruta_output
 
-from ETL import *
 if __name__ == '__main__':
     ruta_original = recibe_ruta("Dame la ruta de tu query original: ")
     ruta_actualizada = recibe_ruta("Dame la ruta de tu query actualizada: ")
@@ -11,15 +11,20 @@ if __name__ == '__main__':
     df_actualizada = extraer_datos(query_actualizada_txt, engine)
     calendario = valida_calendario(df_original, df_actualizada)
     claves_desc = valida_descriptivos(df_original, df_actualizada)
+    original_nulos, actualizada_nulos = registros_nulos(df_original, df_actualizada)
     tabla_dimensiones, columnas_originales, columnas_actualizadas = get_dimensiones(df_original, df_actualizada)
     comunes, solo_original, solo_actualizado, dif_total = valida_dimensiones(columnas_originales, columnas_actualizadas)
     columnas_comunes = list(comunes)
+    columnas_comunes.append('LLAVE')
     a, b = armar_llave_df(df_original, df_actualizada, llave)
     final = compara_todo(a, b, columnas_comunes)
-    exporta_df(calendario)
-    exporta_df(claves_desc)
-    exporta_df(tabla_dimensiones)
-    exporta_df(final)
+    resultados = {'Valida_calendario': calendario,
+                  'Valida_descriptivos': claves_desc,
+                  'Valida_dimensiones': tabla_dimensiones,
+                  'Vacíos_originales': original_nulos,
+                  'Vacíos_actualizadas': actualizada_nulos,
+                  'Cruce Completo':final}
+    genera_reporte(resultados, archivo=ruta_output)
     print(f'El número de columnas en común: {len(columnas_comunes)}')
     print(f'Nombre de las columnas que sólo están en la query original:{','.join(solo_original)}')
     print(f'Nombre de las columnas que sólo están en la query actualizado:{','.join(solo_actualizado)}')
