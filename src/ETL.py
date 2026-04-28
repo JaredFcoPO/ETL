@@ -22,7 +22,6 @@ def extraer_datos(texto_query, engine):
     return df
 
 def valida_calendario(df_original, df_actualizada):
-    pd.set_option('display.float_format', '{:,.2f}'.format)
     calendarios_original = df_original[columnas_importes].sum()
     calendarios_actualizada = df_actualizada[columnas_importes].sum()
     df_original_c = calendarios_original.reset_index()
