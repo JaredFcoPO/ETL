@@ -8,6 +8,7 @@ env/
 *.ipynb
 *.xlsx
 *.xls
+*.csv
 /queries/
 /data/
 # Archivos de configuración de PyCharm

@@ -10,7 +10,7 @@ def recibe_ruta(mensaje):
     return ruta
 
 def cargar_query(ruta):
-    with open(ruta, 'r', encoding='utf8') as f:
+    with open(ruta, 'r', encoding='utf-8') as f:
         return f.read()
 
 def extraer_datos(texto_query, engine):
@@ -103,7 +103,7 @@ def genera_reporte(diccionarios_dfs, archivo = 'reporte_completo.xlsx'):
 def recibe_llave(mensaje):
     texto = input(mensaje)
     lista_cruda = texto.replace(" ","").split(",")
-    # Candado: List comprehension para evitar elementos vacíos como '',['a', 'b', 'cc', '']
+    # Candado: List comprehension para evitar elementos vacíos como '', ['a', 'b', 'cc', '']
     # Guarda el elemento 'x' por cada 'x' en la lista, solamente si 'x' no está vacío
     llave_limpia = [x for x in lista_cruda if x]
     return llave_limpia

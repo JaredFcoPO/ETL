@@ -3,7 +3,7 @@
     "enero", "febrero", "marzo", "abril",
     "mayo", "junio", "julio", "agosto",
     "septiembre", "octubre","noviembre",
-    "diciembre","total"
+    "diciembre","anual"
   ],
   "columnas_descriptivos": [
     "clave_presupuestaria","anio","ramo","institucion","unidad_responsable",
